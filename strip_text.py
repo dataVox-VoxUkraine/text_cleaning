@@ -2,7 +2,7 @@ import re
 import pandas
 
 strip_patterns = {
-    'all': [
+    '': [
         (r"\*\[25 лютого\]: за юліанським календарем.*", re.S),
         (r"^[\w ]*фото:.*?\n", re.M | re.I),
         (r"Теги:.*", re.S),
@@ -118,32 +118,23 @@ strip_patterns = {
     ],
     'https://ukranews.com': [
         (r"Больше новостей о:.*", re.S),
-        (r"Коментарии Facebook.*", re.S)
+        (r"Коментарии Facebook.*", re.S),
+        (r"^\* \d+\n \* \d+\n", re.S),
+        (r"^Українські Новини\nУкраїнські Новини\n.*\n\#.*\n.*\n", re.M),
+        (r"^Українські Новини\n.*\n\#.*\n.*\n", re.M)
     ],
-    'www.unn.com.ua' : [],
-    
-    'https://ua.interfax.com.ua': [],
-    
-    '24tv.ua': [],
-    
-    'gordonua.com': [],
-    
+   
     'zik.ua': [
         (r"^Новини за темою:.*?\n", re.M)
-    ],
-    'https://www.pravda.com.ua': [
-#         (r"Нагадаємо:.*", re.S),
     ]
     
 }
 
 
 def mystip(df):
-    for part_to_strip in strip_patterns['all']:
-        df.text.update(df.text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
-
-    for d in df.domain.unique():
-        for part_to_strip in strip_patterns[d]:
-            df.text.update(df[domain==d].text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
+    for domain, patterns in strip_patterns.items():
+        for part_to_strip in patterns:
+            df.text.update(df[df.domain.str.contains(domain)].text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
+        
 
 
