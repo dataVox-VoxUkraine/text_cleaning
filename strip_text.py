@@ -133,8 +133,9 @@ strip_patterns = {
 
 def mystip(df):
     for domain, patterns in strip_patterns.items():
+        domain_mask = df.domain.str.contains(domain)
         for part_to_strip in patterns:
-            df.text.update(df[df.domain.str.contains(domain)].text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
+            df.text.update(df[domain_mask].text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
         
 
 
