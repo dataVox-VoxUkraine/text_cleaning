@@ -130,8 +130,8 @@ def clean(text):
         text = re.sub(r"([{prefix}])&#39\s?([{suffix}])".format(
             prefix=APOSTROPHY_PREFIX, suffix=APOSTROPHY_SUFFIX), r"\1'\2", text)
 
-        # add space between sentences if needed
-        text = re.sub(r"([\.\?\!])([А-ЯІЇЄҐA-Z])", r"\1 \2", text)
+        # add space between sentences if needed (with workaround for  Цензор.НЕТ)
+        text = re.sub(r"(?<!Цензор)([\.\?\!])([А-ЯІЇЄҐA-Z])", r"\1 \2", text) 
        
         # clean up latin/cyrillic character mix
         # cases:
