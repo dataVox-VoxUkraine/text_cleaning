@@ -9,6 +9,7 @@ strip_patterns = {
         (r"Тако?же? читайте.*$", re.M),
         (r"Якщо побачили помилку.*", re.S), 
         (r"Если Вы заметили орфографическую ошибку.*", re.S), 
+        (r"Если вы нашли ошибку в тексте.*", re.S),
         (r"(^>.*\n)+", re.M), 
         (r"этот материал доступен на русском", re.I),
         (r"читать ((новость|этот материал) )?на русском", re.I),
@@ -17,7 +18,9 @@ strip_patterns = {
         (r"(ПУБЛИКАЦИИ|МАТЕРИАЛЫ) ПО ТЕМЕ.*", re.S),
         (r"^Твитнуть$", re.M),
         (r"\* {,4}\* Розсилка ?\nВІДПРАВИТИ\n?\n?\n?", re.S),
-        (r"\n\n\nКопіювати код для вставки", re.S)
+        (r"\n\n\nКопіювати код для вставки", re.S), 
+        (r"^Цей матеріал також доступний українською$", re.M), 
+        (r"^Нажмите на фото для увеличения изображения.*$", re.M)
        
     # strip patterns by domains 
     ],
@@ -33,7 +36,8 @@ strip_patterns = {
     'https://www.rbc.ua': [
         (r"Читайте нас в Google News та підписуйтесь.*", re.S),
         (r"Надіслати новину другу\nКому\:\*\nВаш коментар\nНадіслати(\nДякуємо, Ваше повідомлення відправлено\!  \n  \nOk\n)?", re.M),
-        (r"Дякуємо, Ваше повідомлення відправлено\!\nOk$", re.M)
+        (r"Дякуємо, Ваше повідомлення відправлено\!", re.M),
+        (r"^Ok$", re.M)
     ],
     'https://www.unian.ua': [
         (r"Читайте останні новини України та світу.*", re.S),
@@ -114,7 +118,7 @@ strip_patterns = {
         (r"\* Повноекранний режим$", re.M),
 #         (r"###### Читайте також: ?\n\w+.*?\n", False),
         (r"Приєднуйтесь також до tsn\.ua у Google News.*", re.S),
-         (r"^ ?\* ?(Facebook|Twitter|Telegram|Messenger|Viber)$", re.M)
+         (r"^ ?\* ?(Facebook|Twitter|Telegram|Messenger|Viber|WhatsApp)$", re.M)
     ],
     'https://hromadske.radio': [
         (r"Підписуйтесь на Telegram-канал.*", re.S)
@@ -133,7 +137,7 @@ strip_patterns = {
     ],
     'https://ukr.lb.ua': [
         (r"Читайте головні новини LB\.ua.*", re.S),
-        (r"^(Facebook|Twitter)\n", re.M),
+        (r"^(Facebook|Twitter)$", re.M),
         (r"^Темы:.*", re.S|re.M)
     ],
     'https://ukranews.com': [
@@ -176,6 +180,12 @@ strip_patterns = {
 
 }
 
+def remove_newlines(text):
+    text = re.sub(r"\n{2,}", "\n", text)
+    text = re.sub(r" {2,}", " ", text)
+    text = text.strip()
+    return text
+
 
 def mystrip(df):
     for domain, patterns in strip_patterns.items():
@@ -183,4 +193,6 @@ def mystrip(df):
         domain_mask = df.domain.str.contains(domain)
         for part_to_strip in patterns:
             df.text.update(df[domain_mask].text.str.replace(part_to_strip[0], "", flags=part_to_strip[1]))
+    df['text'] = df.text.apply(remove_newlines)
+
 
