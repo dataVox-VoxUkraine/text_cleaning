@@ -4,13 +4,11 @@ import unicodedata
 import html2text
 from sqlalchemy import create_engine
 
-chunksize = 1000
-user = 'postgres'
-password = 'secret'
-db_name = 'media_ecosystem'
-table_name = 'news_items'
 
-def read_table():
+
+def read_table(user = 'postgres', password = 'secret', 
+                db_name = 'db_name', table_name = 'tb_name', chunksize = 1000):
+
     db_url = 'postgresql://localhost/{}?user={}&password={}'.format(db_name, user, password)
     sql_engine = create_engine(db_url, echo=False)
     conn = sql_engine.connect()
@@ -19,7 +17,7 @@ def read_table():
 
 
 
-def get_text_from_html(output_file):
+def get_text_maker():
     # HTML2Text keeps formatting, so all paragraphes are saved
     # you get markdown text, so headers are marked with '#' and lists with '*'
     text_maker = html2text.HTML2Text()
@@ -34,8 +32,12 @@ def get_text_from_html(output_file):
     # Ignore all emphasis formatting in the html.
     text_maker.ignore_emphasis = True
 
-    table_chunks = read_table()
+    return text_maker
 
+
+def get_news_texts(output_file)
+    text_maker = get_text_maker()
+    table_chunks = read_table()
     df_parts = []
 
     for chunk in table_chunks:
@@ -44,6 +46,7 @@ def get_text_from_html(output_file):
         del chunk
     df = pd.concat(df_parts)
     df.to_csv(output_file, index=False)
+    return df
 
 
 # based on https://github.com/brown-uk/nlp_uk/blob/master/src/main/groovy/org/nlp_uk/other/CleanText.groovy
