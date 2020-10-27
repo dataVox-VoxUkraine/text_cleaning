@@ -1,5 +1,5 @@
 strip_patterns = {
-    # parts to initially strip in all news 
+#     parts to initially strip in all news 
     '': [
         (r"\*\[25 лютого\]: за юліанським календарем.*", re.S),
         (r"^[\w ]*фото:.*?\n", re.M | re.I),
@@ -7,7 +7,7 @@ strip_patterns = {
         (r"Читайте також( статтю)?: ?\n?.*\n?", re.M | re.I),
         (r"Читайте більше:.*$", re.M),
         (r"Тако?же? читайте.*$", re.M),
-        (r"Якщо побачили помилку.*", re.S), 
+        (r"Якщо (ви )?(побачили|виявили|помітили) помилку.*", re.S|re.I), 
         (r"Если Вы заметили орфографическую ошибку.*", re.S), 
         (r"Если вы нашли ошибку в тексте.*", re.S),
         (r"(^>.*\n)+", re.M), 
@@ -20,10 +20,25 @@ strip_patterns = {
         (r"\* {,4}\* Розсилка ?\nВІДПРАВИТИ\n?\n?\n?", re.S),
         (r"\n\n\nКопіювати код для вставки", re.S), 
         (r"^Цей матеріал також доступний українською$", re.M), 
-        (r"^Нажмите на фото для увеличения изображения.*$", re.M)
-       
-    # strip patterns by domains 
+        (r"^Нажмите на фото для увеличения изображения.*$", re.M),
+        (r"https://[a-z\./0-9@:%_\+~#\?&=\-\(\)]+", re.I|re.M),
+        (r"фото: instagram.com", re.M),
+        (r"фото:? (ua\.)?depositphotos(\.com)?", re.M|re.I),
+        (r"© president\.gov\.ua ?$", re.M),
+        (r" ?\* ?Поділитися (на|у) (Facebook|Twitter|Telegram|ВКонтакте)$", re.M),
+        (r"Share on .*$", re.M), 
+        (r" ?\* ?Надіслати листом$", re.M),
+        (r"^© ?REUTERS ?$", re.M),
+        (r"^[\* ]*Кількість (переглядів|коментарів) \d* ?$", re.M),
+        (r"^© фото president\.gov\.ua ?$", re.M),
+        (r"Авторские права на изображение: TUT. BY", re.M),
+        (r"^Коментувати Роздрукувати$", re.M),
+        (r"Фото: ?Pixabay", re.I)
+
     ],
+    
+     # strip patterns by domains 
+    
     'apostrophe.ua': [
         (r"### Новини.*?Всі новини", re.S),
         (r"Версія для друку.*", re.S),
@@ -48,9 +63,10 @@ strip_patterns = {
         (r"^.*?Редактор Цензор\. НЕТ", re.S),
         (r"Мне нравится.*", re.S),
         (r"^Читайте (также ?)?(на \"?Цензор\. НЕТ\"?)?:.*?$", re.M),
-        (r"^Все про:.*?$", re.M),
+#         (r"^Все про:.*?$", re.M),
         (r"Топ комментарии.*", re.S),
-        (r"^Читайте:.*?$", re.M)
+        (r"^Читайте:.*$", re.M),
+        (r"\nИсточник:.*", re.S)
     ],
     'https://politeka.net/uk': [
         (r"Популярні новини зараз.*?Показати ще", re.S)
@@ -65,7 +81,7 @@ strip_patterns = {
     ],
     'https://hromadske.ua/': [
         (r"Поділитись.*", re.S),
-        (r"Більше про:.*", re.S),
+#         (r"Більше про:.*", re.S),
         (r"^Інформаційна гігієна не менш важлива за особисту.*?$", re.M),
         (r"### читайте також ?\n.*\n.*\n", re.M), ###???
         (r"### читайте також ?\n.*$", re.M)
@@ -118,7 +134,8 @@ strip_patterns = {
         (r"\* Повноекранний режим$", re.M),
 #         (r"###### Читайте також: ?\n\w+.*?\n", False),
         (r"Приєднуйтесь також до tsn\.ua у Google News.*", re.S),
-         (r"^ ?\* ?(Facebook|Twitter|Telegram|Messenger|Viber|WhatsApp)$", re.M)
+         (r"^ ?\* ?(Facebook|Twitter|Telegram|Messenger|Viber)$", re.M),
+        (r"^ ?\* ?WhatsApp$", re.M),
     ],
     'https://hromadske.radio': [
         (r"Підписуйтесь на Telegram-канал.*", re.S)
@@ -169,18 +186,31 @@ strip_patterns = {
         (r"^на весь екран згорнути$", re.M)
     ],
     '24tv.ua': [
-        (r"Читайте тако?же?:?.*$", re.M)
+        (r"Читайте тако?же?:?.*$", re.M),
+        (r"^Поділитися новиною ?$", re.M),
+        (r"^ ?\* \* \* \* \* ?$", re.M)
     ], 
+    'suspilne.media': [
+        (r"## Що відомо.*", re.S),
+        (r"## Читайте також.*", re.S),
+        (r"(> )?Читайте також:.*", re.M)
+    ],
+    'babel.ua': [
+        (r"(^ \* .*$){1,}$", re.M)
+    ],
     # this shoud be the last part
     # patterns to finally strip in all news 
     # it is expected that every domain contains a dot
     '.': [
-        (r"Читайте тако?же?:?\n?.*$", re.M | re.I)
+        (r"Читайте тако?же?:?\n?.*$", re.M | re.I),
+        (r"^ ?\* ?$", re.M)
     ]
 
 }
 
+
 def remove_newlines(text):
+    text = re.sub(r"\n \n", "\n", text)
     text = re.sub(r"\n{2,}", "\n", text)
     text = re.sub(r" {2,}", " ", text)
     text = text.strip()
