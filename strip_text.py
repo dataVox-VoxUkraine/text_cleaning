@@ -33,7 +33,8 @@ strip_patterns = {
         (r"^© фото president\.gov\.ua ?$", re.M),
         (r"Авторские права на изображение: TUT. BY", re.M),
         (r"^Коментувати Роздрукувати$", re.M),
-        (r"Фото: ?Pixabay", re.I)
+        (r"Фото: ?Pixabay", re.I),
+        (r"Share to (facebook|twitter|telegram|viber)", re.I)
 
     ],
     
